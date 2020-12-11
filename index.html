@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hostile Aliens</title>
+    <style></style>
+  </head>
+  <body>
+    <main></main>
+    <script>
+      class Ship {
+        constructor(type, hp, damage) {
+          this.type = type;
+          this.hp = hp;
+          this.damage = damage;
+          this.isAlive = true;
+        }
+
+        destroy() {
+          this.isAlive = false;
+        }
+
+        hit() {
+          this.hp -= this.damage;
+          if (this.hp <= 0) {
+            this.destroy();
+          }
+        }
+
+        render() {
+          return `<p>${this.type[0].toUpperCase()} | ${this.hp}</p>`;
+        }
+      }
+
+      class Game {
+        constructor(shipData) {
+          this.shipData = shipData;
+          this.ships = [];
+          this.gameOver = false;
+        }
+
+        addFireMethod() {
+          document.querySelector("button").addEventListener("click", () => this.fire());
+        }
+
+        createShips() {
+          this.shipData.forEach((ship) => {
+            for (let index = 0; index < ship.number; index++) {
+              this.ships.push(new Ship(ship.type, ship.hp, ship.damage));
+            }
+          });
+        }
+
+        pickRandomShip() {
+          return Math.floor(Math.random() * this.ships.length);
+        }
+
+        checkMother() {
+          if (!this.ships[0].isAlive) {
+            this.ships.forEach((ship) => {
+              ship.isAlive = false;
+            });
+          }
+        }
+
+        cleanShips() {
+          const newShips = this.ships.filter((ship) => ship.isAlive);
+          this.ships = newShips;
+          this.screen = new Screen(this.ships);
+          if (this.ships.length === 0) {
+            this.gameOver = true;
+          }
+        }
+
+        refreshScreen() {
+          this.screen.insertBoard();
+          this.addFireMethod();
+        }
+
+        checkGameOver() {
+          if (this.gameOver) {
+            const button = document.querySelector("button");
+            button.innerHTML = "Play again?";
+            button.addEventListener("click", () => this.init());
+          }
+        }
+
+        fire() {
+          this.randomShip = this.ships[pickRandomShip()];
+          this.randomShip.hit();
+          this.checkMother();
+          this.cleanShips();
+          this.refreshScreen();
+          this.checkGameOver();
+        }
+
+        init() {
+          this.gameOver = false;
+          this.createShips();
+          this.screen = new Screen(this.ships);
+          this.refreshScreen();
+        }
+      }
+
+      class Screen {
+        constructor(ships) {
+          this.ships = ships;
+          this.domElement = document.querySelector("main");
+        }
+
+        insertBoard() {
+          this.domElement.innerHTML = "";
+          this.ships.forEach((ship) => {
+            this.domElement.innerHTML += ship.render();
+          });
+          this.domElement.innerHTML += "<button>FIRE!!!</button>";
+        }
+      }
+
+      const data = [
+        { type: "mothership", hp: 100, damage: 9, number: 1 },
+        { type: "defence", hp: 80, damage: 10, number: 5 },
+        { type: "attack", hp: 45, damage: 12, number: 8 }
+      ];
+
+      const game = new Game(data);
+
+      game.init();
+    </script>
+  </body>
+</html>
