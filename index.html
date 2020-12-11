@@ -33,6 +33,21 @@
         }
       }
 
+      class Screen {
+        constructor(ships) {
+          this.ships = ships;
+          this.domElement = document.querySelector("main");
+        }
+
+        insertBoard() {
+          this.domElement.innerHTML = "";
+          this.ships.forEach((ship) => {
+            this.domElement.innerHTML += ship.render();
+          });
+          this.domElement.innerHTML += "<button>FIRE!!!</button>";
+        }
+      }
+
       class Game {
         constructor(shipData) {
           this.shipData = shipData;
@@ -87,7 +102,7 @@
         }
 
         fire() {
-          this.randomShip = this.ships[pickRandomShip()];
+          this.randomShip = this.ships[this.pickRandomShip()];
           this.randomShip.hit();
           this.checkMother();
           this.cleanShips();
@@ -100,21 +115,6 @@
           this.createShips();
           this.screen = new Screen(this.ships);
           this.refreshScreen();
-        }
-      }
-
-      class Screen {
-        constructor(ships) {
-          this.ships = ships;
-          this.domElement = document.querySelector("main");
-        }
-
-        insertBoard() {
-          this.domElement.innerHTML = "";
-          this.ships.forEach((ship) => {
-            this.domElement.innerHTML += ship.render();
-          });
-          this.domElement.innerHTML += "<button>FIRE!!!</button>";
         }
       }
 
